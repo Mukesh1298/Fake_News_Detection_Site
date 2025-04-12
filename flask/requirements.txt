@@ -1,0 +1,12 @@
+In Training of ML model
+Install :-
+Flask
+pandas	       
+numpy	       
+seaborn	        
+matplotlib	       
+scikit-learn	       
+re	             
+string	          
+pickle	   
+Flask_SQLAlchemy       

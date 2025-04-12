@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <style>
+        /* Global Styling */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-field textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            resize: none;
+            transition: all 0.3s;
+            height: 100px;
+        }
+
+        .input-field textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+
+        .btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .result.fake {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+        }
+
+        .result.real {
+            background: rgba(0, 255, 0, 0.1);
+            color: #008000;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fake News Detector</h1>
+        <p>Welcome, {{ session['username'] }}!</p> <!-- Personalized greeting -->
+
+        <!-- Logout Button -->
+        <a href="{{ url_for('logout') }}">
+            <button class="btn">Logout</button>
+        </a>
+
+        <p>Enter a news headline or article content to check its authenticity.</p>
+        <div class="input-field">
+            <textarea id="newsInput" name="newsInput" placeholder="Type your news here..."></textarea>
+        </div>
+        <button class="btn" id="detectButton">Analyze</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("detectButton").addEventListener("click", async () => {
+            const newsText = document.getElementById("newsInput").value.trim();
+            
+            if (!newsText) {
+                alert("Please enter some text to analyze.");
+                return;
+            }
+        
+            try {
+                // Send text to Flask backend via API
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: newsText })
+                });
+        
+                const data = await response.json();  // Get response from Flask
+                
+                // Show result in the HTML
+                const resultDiv = document.getElementById("result");
+                resultDiv.style.display = "block";
+                resultDiv.textContent = `This news appears to be ${data.prediction}.`;
+                resultDiv.className = `result ${data.prediction.toLowerCase()}`;
+        
+            } catch (error) {
+                alert("Error connecting to server. Try again!");
+            }
+        });
+        
+        
+    </script>
+</body>
+</html>
